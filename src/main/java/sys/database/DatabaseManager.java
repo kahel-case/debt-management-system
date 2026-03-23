@@ -8,6 +8,8 @@ import java.sql.Statement;
 public class DatabaseManager {
     private static final String USER_DATA = DatabaseCollection.USER_DATA;
 
+    // TABLE NAME: customers
+    // ENTITIES: CustomerID, Surname, FirstName, MiddleName, EmailAddress, ContactNumber, DebtAmount, StartDate, DueDate, Status
     public static void createTable() {
         try (Connection conn = DriverManager.getConnection(USER_DATA)) {
             if (conn != null) {
@@ -21,7 +23,7 @@ public class DatabaseManager {
             Statement stmt = conn.createStatement()) {
             String sql = """
                         CREATE TABLE IF NOT EXISTS customers (
-                            CustomerID INT AUTO_INCREMENT PRIMARY KEY,
+                            CustomerID INTEGER PRIMARY KEY,
                             Surname TEXT NOT NULL,
                             FirstName TEXT NOT NULL,
                             MiddleName TEXT NOT NULL,
@@ -30,7 +32,7 @@ public class DatabaseManager {
                             DebtAmount REAL DEFAULT 0.0,
                             StartDate DATE,
                             DueDate DATE,
-                            status TEXT NOT NULL
+                            Status TEXT NOT NULL
                         );
                     """;
             stmt.execute(sql);

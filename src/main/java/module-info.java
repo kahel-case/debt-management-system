@@ -12,4 +12,5 @@ module sys.main {
     opens sys.controller to javafx.fxml;
     exports sys.database;
     opens sys.database to javafx.fxml;
+    opens sys.classes to javafx.base;
 }

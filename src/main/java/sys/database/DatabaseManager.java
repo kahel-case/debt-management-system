@@ -8,8 +8,9 @@ import java.sql.Statement;
 public class DatabaseManager {
     private static final String USER_DATA = DatabaseCollection.USER_DATA;
 
-    // TABLE NAME: customers
-    // ENTITIES: CustomerID, Surname, FirstName, MiddleName, EmailAddress, ContactNumber, DebtAmount, StartDate, DueDate, Status
+    // TABLE NAME:  customers
+    // ATTRIBUTES:  CustomerID,     Surname,    FirstName,  MiddleName, EmailAddress,   ContactNumber,  DebtAmount, StartDate,  DueDate,     Status
+    // TYPES:       INTEGER,        TEXT,       TEXT,       TEXT,       VARCHAR(255),   TEXT,           REAL,       DATE,       DATE,       TEXT
     public static void createTable() {
         try (Connection conn = DriverManager.getConnection(USER_DATA)) {
             if (conn != null) {

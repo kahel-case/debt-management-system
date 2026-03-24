@@ -1,12 +1,21 @@
 package sys.database;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import sys.classes.Customer;
+
+import java.sql.*;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 public class DatabaseHandler {
+    // TABLE NAME:  customers
+    // ATTRIBUTES:  CustomerID, Surname, FirstName, MiddleName, EmailAddress, ContactNumber, DebtAmount, StartDate, DueDate, Status
+
+    // TABLE --+--
+    // ATTRIBUTES:  CustomerID,     Surname,    FirstName,  MiddleName, EmailAddress,   ContactNumber,  DebtAmount, StartDate,  DueDate,    Status
+    // TYPES:       INTEGER,        TEXT,       TEXT,       TEXT,       VARCHAR(255),   TEXT,           REAL,       DATE,       DATE,       TEXT
+
     private static final String USER_DATA = DatabaseCollection.USER_DATA;
 
     public static void insertDebt(String surname, String firstName, String middleName, String emailAddress, String contactNumber, String debtAmount, LocalDate startDate, LocalDate dueDate) {
@@ -20,7 +29,7 @@ public class DatabaseHandler {
                 startDate,
                 dueDate
         };
-        String status = "PENDING";
+        String status = DatabaseUtilities.checkStatus(dueDate);
 
         String sql = "INSERT INTO customers (Surname, FirstName, MiddleName, EmailAddress, ContactNumber, DebtAmount, StartDate, DueDate, Status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -44,4 +53,35 @@ public class DatabaseHandler {
         }
     }
 
+    @SuppressWarnings({"ClassEscapesDefinedScope", "CallToPrintStackTrace"})
+    public static ObservableList<Customer> fetchAll() {
+        ObservableList<Customer> list = FXCollections.observableArrayList();
+
+        try (Connection conn = DriverManager.getConnection(USER_DATA);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM customers")) {
+
+            while (rs.next()) {
+                int customerID = rs.getInt("CustomerID");
+                String surname = rs.getString("Surname");
+                String firstName = rs.getString("FirstName");
+                String middleName = rs.getString("MiddleName");
+                String emailAddress = rs.getString("EmailAddress");
+                String contactNumber = rs.getString("ContactNumber");
+                String debtAmount = rs.getString("DebtAmount");
+                String startDate = rs.getString("StartDate");
+                String dueDate = rs.getString("dueDate");
+                String status = rs.getString("Status");
+
+                int daysLeft = (int) ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(dueDate));
+
+                Customer customer = new Customer(customerID, surname, firstName, middleName, emailAddress, contactNumber, debtAmount, startDate, dueDate, status, daysLeft);
+                list.add(customer);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }

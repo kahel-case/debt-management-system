@@ -15,6 +15,7 @@ public class Main extends Application {
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Debt-tabase");
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 

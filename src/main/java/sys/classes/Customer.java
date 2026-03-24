@@ -1,7 +1,7 @@
 package sys.classes;
 
 public class Customer {
-    private String customerID;
+    private int customerID;
     private String surname;
     private String firstName;
     private String middleName;
@@ -11,8 +11,9 @@ public class Customer {
     private String startDate;
     private String dueDate;
     private String status;
+    private int daysLeft;
 
-    public String getCustomerID() {
+    public int getCustomerID() {
         return customerID;
     }
 
@@ -52,7 +53,11 @@ public class Customer {
         return status;
     }
 
-    public Customer(String customerID, String surname, String firstName, String middleName, String emailAddress, String contactNumber, String debtAmount, String startDate, String dueDate, String status) {
+    public int getDaysLeft() {
+        return daysLeft;
+    }
+
+    public Customer(int customerID, String surname, String firstName, String middleName, String emailAddress, String contactNumber, String debtAmount, String startDate, String dueDate, String status, int daysLeft) {
         this.customerID = customerID;
         this.surname = surname;
         this.firstName = firstName;
@@ -63,5 +68,6 @@ public class Customer {
         this.startDate = startDate;
         this.dueDate = dueDate;
         this.status = status;
+        this.daysLeft = daysLeft;
     }
 }

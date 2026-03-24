@@ -11,6 +11,8 @@ import javax.swing.*;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
+import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 
 import static sys.database.DatabaseHandler.*;
 
@@ -42,7 +44,7 @@ public class MainController implements Initializable {
     @FXML private TableColumn<Customer, String> middleNameCol;
     @FXML private TableColumn<Customer, String> emailAddressCol;
     @FXML private TableColumn<Customer, String> contactNumberCol;
-    @FXML private TableColumn<Customer, String> debtAmountCol;
+    @FXML private TableColumn<Customer, Float> debtAmountCol;
     @FXML private TableColumn<Customer, String> startDateCol;
     @FXML private TableColumn<Customer, String> dueDateCol;
     @FXML private TableColumn<Customer, String> statusCol;
@@ -86,6 +88,18 @@ public class MainController implements Initializable {
         });
         // endregion
 
+        // region This hidden section is for the Debt Amount text formatter to allow only two decimal places max
+        Pattern validEditingState = Pattern.compile("-?\\d*(\\.\\d{0,2})?");
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String newText = change.getControlNewText();
+            if (validEditingState.matcher(newText).matches()) {
+                return change;
+            }
+            return null;
+        };
+        textField_debtAmount.setTextFormatter(new TextFormatter<>(filter));
+        // endregion
+
         panels = new VBox[]{mainPanel, createPanel, readPanel};
         createDebtTextFields = new TextField[]{textField_surname, textField_firstName, textField_middleName, textField_emailAddress, textField_contactNumber, textField_debtAmount};
 
@@ -100,18 +114,43 @@ public class MainController implements Initializable {
         String middleName = textField_middleName.getText().trim();
         String emailAddress = textField_emailAddress.getText().trim();
         String contactNumber = textField_contactNumber.getText().trim();
-        String debtAmount = textField_debtAmount.getText().trim();
+        float debtAmount = 0;
+
         LocalDate startDate = debtStartDate.getValue();
         LocalDate dueDate = debtDueDate.getValue();
+
+        if (!Utilities.validateTextFields(surname, firstName, emailAddress, contactNumber, startDate, dueDate)) {
+            if (startDate != null && dueDate != null && dueDate.isBefore(startDate)) {
+                debtDueDate.setValue(LocalDate.now());
+            }
+            return;
+        }
+
+        // region This hidden section is for a hyper-specific validator purely for the debt amount
+        StringBuilder errors = new StringBuilder();
+        String amountRaw = textField_debtAmount.getText().trim();
+        if (amountRaw.isEmpty()) {
+            errors.append("- Debt Amount is required.\n");
+        } else {
+            try {
+                debtAmount = Float.parseFloat(amountRaw);
+                if (debtAmount <= 0) errors.append("- Amount must be greater than zero.\n");
+            } catch (NumberFormatException e) {
+                errors.append("- Amount must be a valid number.\n");
+            }
+        }
+        if (!errors.isEmpty()) {
+            Utilities.showErrorAlert(errors.toString());
+            return;
+        }
+        // endregion
 
         insertDebt(surname, firstName, middleName, emailAddress, contactNumber, debtAmount, startDate, dueDate);
         for (TextField textField : createDebtTextFields) {
             textField.setText("");
         }
-
         JOptionPane.showMessageDialog(null, "New debt entry created successfully~");
     }
-
 
     /*
     *   PAGE MANAGER
@@ -131,12 +170,13 @@ public class MainController implements Initializable {
     protected void onReadEntries() {
         PageManager.switchPage(panels, readPanel);
 
-        // Automatically sorts the DUE DATE column in ascending order
+        // region Hidden Section: Automatically sorts the DUE DATE column in ascending order
         daysLeftCol.setSortType(TableColumn.SortType.ASCENDING);
         readTableView.setItems(fetchAll());
         readTableView.getSortOrder().clear();
         readTableView.getSortOrder().add(daysLeftCol);
         readTableView.sort();
+        // endregion
     }
 
     // BACK TO MAIN PANEL

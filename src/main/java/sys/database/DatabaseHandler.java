@@ -18,7 +18,7 @@ public class DatabaseHandler {
 
     private static final String USER_DATA = DatabaseCollection.USER_DATA;
 
-    public static void insertDebt(String surname, String firstName, String middleName, String emailAddress, String contactNumber, String debtAmount, LocalDate startDate, LocalDate dueDate) {
+    public static void insertDebt(String surname, String firstName, String middleName, String emailAddress, String contactNumber, float debtAmount, LocalDate startDate, LocalDate dueDate) {
         Object[] elements = new Object[]{
                 surname,
                 firstName,
@@ -41,6 +41,8 @@ public class DatabaseHandler {
                     stmt.setString(i+1, elements[i].toString());
                 } else if (elements[i] instanceof LocalDate) {
                     stmt.setObject(i+1, elements[i]);
+                } else {
+                    stmt.setString(i+1, elements[i].toString());
                 }
             }
             stmt.setString(elements.length+1, status);
@@ -68,7 +70,7 @@ public class DatabaseHandler {
                 String middleName = rs.getString("MiddleName");
                 String emailAddress = rs.getString("EmailAddress");
                 String contactNumber = rs.getString("ContactNumber");
-                String debtAmount = rs.getString("DebtAmount");
+                float debtAmount = rs.getFloat("DebtAmount");
                 String startDate = rs.getString("StartDate");
                 String dueDate = rs.getString("dueDate");
                 String status = rs.getString("Status");

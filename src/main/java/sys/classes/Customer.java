@@ -7,7 +7,7 @@ public class Customer {
     private String middleName;
     private String emailAddress;
     private String contactNumber;
-    private String debtAmount;
+    private float debtAmount;
     private String startDate;
     private String dueDate;
     private String status;
@@ -37,7 +37,7 @@ public class Customer {
         return contactNumber;
     }
 
-    public String getDebtAmount() {
+    public float getDebtAmount() {
         return debtAmount;
     }
 
@@ -57,7 +57,7 @@ public class Customer {
         return daysLeft;
     }
 
-    public Customer(int customerID, String surname, String firstName, String middleName, String emailAddress, String contactNumber, String debtAmount, String startDate, String dueDate, String status, int daysLeft) {
+    public Customer(int customerID, String surname, String firstName, String middleName, String emailAddress, String contactNumber, float debtAmount, String startDate, String dueDate, String status, int daysLeft) {
         this.customerID = customerID;
         this.surname = surname;
         this.firstName = firstName;
